@@ -1,7 +1,5 @@
 # Roll a Ball (Unity)
 
-A Unity learning project for the classic “Roll a Ball” game.
-
 ## Getting the project
 
 Clone the repo and pull updates:
@@ -11,6 +9,8 @@ git clone https://github.com/redesign3d/roll-a-ball.git
 cd roll-a-ball
 git pull
 ```
+
+Or use GitHub Desktop if unfamiliar with the CLI.
 
 ## Setup on a new machine
 
