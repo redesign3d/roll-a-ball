@@ -7,7 +7,7 @@ public class ConfettiWhenEmpty : MonoBehaviour
 
     [Header("Optional")]
     [SerializeField] private Camera targetCamera;
-    [SerializeField] private float distanceFromCamera = 10f;
+    [SerializeField] private float distanceFromCamera = 5f;
     [SerializeField] private float topOffset = 1f;
     [SerializeField] private Vector2 fallSpeed = new Vector2(3f, 6f);
 
@@ -61,25 +61,19 @@ public class ConfettiWhenEmpty : MonoBehaviour
 
         Vector3 spawnPosition = center + targetCamera.transform.up * topOffset;
 
-        ParticleSystem confetti = Instantiate(confettiPrefab, spawnPosition, Quaternion.identity);
+        // Align particle system with camera so particles fall parallel to screen
+        ParticleSystem confetti = Instantiate(confettiPrefab, spawnPosition, targetCamera.transform.rotation);
 
         var main = confetti.main;
-        main.simulationSpace = ParticleSystemSimulationSpace.World;
-        main.playOnAwake = false;
+        main.simulationSpace = ParticleSystemSimulationSpace.Local;
 
         var shape = confetti.shape;
         shape.enabled = true;
         shape.shapeType = ParticleSystemShapeType.Box;
-        shape.scale = new Vector3(Vector3.Distance(left, right), 0.2f, 0.2f);
-
-        var velocity = confetti.velocityOverLifetime;
-        velocity.enabled = true;
-        velocity.space = ParticleSystemSimulationSpace.World;
-        velocity.x = new ParticleSystem.MinMaxCurve(-0.5f, 0.5f);
-        velocity.y = new ParticleSystem.MinMaxCurve(-fallSpeed.y, -fallSpeed.x);
+        shape.scale = new Vector3(Vector3.Distance(left, right) * 1.2f, 0.5f, 0.5f);
 
         confetti.Play();
 
-        Destroy(confetti.gameObject, 10f);
+        Destroy(confetti.gameObject, 12f);
     }
 }
