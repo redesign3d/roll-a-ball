@@ -7,9 +7,9 @@ public class ConfettiWhenEmpty : MonoBehaviour
 
     [Header("Optional")]
     [SerializeField] private Camera targetCamera;
-    [SerializeField] private float distanceFromCamera = 10f;
+    [SerializeField] private float distanceFromCamera = 5f;
     [SerializeField] private float topOffset = 1f;
-    [SerializeField] private Vector2 fallSpeed = new Vector2(3f, 6f);
+    [SerializeField] private Vector2 fallSpeed = new Vector2(3.3f, 6.6f);
 
     private bool hasPlayed;
 
@@ -51,9 +51,10 @@ public class ConfettiWhenEmpty : MonoBehaviour
             return;
         }
 
+        float depthOffset = Mathf.Max(0.01f, distanceFromCamera);
         float depth = targetCamera.orthographic
-            ? targetCamera.nearClipPlane + 1f
-            : distanceFromCamera;
+            ? targetCamera.nearClipPlane + depthOffset
+            : depthOffset;
 
         Vector3 left = targetCamera.ViewportToWorldPoint(new Vector3(0f, 1f, depth));
         Vector3 right = targetCamera.ViewportToWorldPoint(new Vector3(1f, 1f, depth));
@@ -61,25 +62,39 @@ public class ConfettiWhenEmpty : MonoBehaviour
 
         Vector3 spawnPosition = center + targetCamera.transform.up * topOffset;
 
-        ParticleSystem confetti = Instantiate(confettiPrefab, spawnPosition, Quaternion.identity);
+        // Align particle system with camera so particles fall parallel to screen
+        ParticleSystem confetti = Instantiate(confettiPrefab, spawnPosition, targetCamera.transform.rotation);
+        confetti.transform.SetParent(targetCamera.transform, true);
 
         var main = confetti.main;
-        main.simulationSpace = ParticleSystemSimulationSpace.World;
-        main.playOnAwake = false;
+        main.simulationSpace = ParticleSystemSimulationSpace.Local;
+        main.gravityModifier = 0f;
 
         var shape = confetti.shape;
         shape.enabled = true;
         shape.shapeType = ParticleSystemShapeType.Box;
-        shape.scale = new Vector3(Vector3.Distance(left, right), 0.2f, 0.2f);
+        float width = Vector3.Distance(left, right);
+        shape.scale = new Vector3(width * 1.1f, 0.5f, 0.1f);
 
-        var velocity = confetti.velocityOverLifetime;
-        velocity.enabled = true;
-        velocity.space = ParticleSystemSimulationSpace.World;
-        velocity.x = new ParticleSystem.MinMaxCurve(-0.5f, 0.5f);
-        velocity.y = new ParticleSystem.MinMaxCurve(-fallSpeed.y, -fallSpeed.x);
+        ConfigureVelocity(confetti);
 
         confetti.Play();
 
-        Destroy(confetti.gameObject, 10f);
+        Destroy(confetti.gameObject, 12f);
+    }
+
+    private void ConfigureVelocity(ParticleSystem confetti)
+    {
+        var velocity = confetti.velocityOverLifetime;
+        velocity.enabled = true;
+        velocity.space = ParticleSystemSimulationSpace.Local;
+
+        float minFall = Mathf.Min(Mathf.Abs(fallSpeed.x), Mathf.Abs(fallSpeed.y));
+        float maxFall = Mathf.Max(Mathf.Abs(fallSpeed.x), Mathf.Abs(fallSpeed.y));
+        float horizontalMax = maxFall * 0.35f;
+
+        velocity.x = new ParticleSystem.MinMaxCurve(-horizontalMax, horizontalMax);
+        velocity.y = new ParticleSystem.MinMaxCurve(-maxFall, -minFall);
+        velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f);
     }
 }
