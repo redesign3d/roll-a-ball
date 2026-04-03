@@ -1,19 +1,31 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class CameraController : MonoBehaviour
 {
-    public GameObject player; // Reference to the player GameObject
-    private Vector3 offset; // Offset between the camera and the player
+    [FormerlySerializedAs("player")]
+    [SerializeField] private Transform target;
+    private Vector3 offset;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Start()
     {
-        offset = transform.position - player.transform.position;
+        if (target == null)
+        {
+            Debug.LogWarning("CameraController target is not assigned.");
+            enabled = false;
+            return;
+        }
+
+        offset = transform.position - target.position;
     }
 
-    // Update is called once per frame
-    void LateUpdate()
+    private void LateUpdate()
     {
-        transform.position = player.transform.position + offset;
+        if (target == null)
+        {
+            return;
+        }
+
+        transform.position = target.position + offset;
     }
 }
