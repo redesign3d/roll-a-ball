@@ -2,9 +2,10 @@
 
 ## Getting the project
 
-Clone the repo and pull updates:
+Clone the repo and pull updates to a local directory of your choice:
 
 ```bash
+cd whatever-directory-you-want
 git clone https://github.com/redesign3d/roll-a-ball.git
 cd roll-a-ball
 git pull
@@ -12,11 +13,11 @@ git pull
 
 Or use GitHub Desktop if unfamiliar with the CLI.
 
-## Setup on a new machine
+## Opening in Unity
 
 1. Install Unity Hub.
-2. Install Unity **6000.3.11f1** (the version used by this project).
-3. In Unity Hub, click **Open** and select the project folder.
+2. Install Unity **6000.3.11f1** (or another, compatible Unity 6.3 LTS version).
+3. In Unity Hub, click **Open** and select the project folder (the directory "roll-a-ball" in this case, which was cloned into the folder you chose previously).
 4. Let Unity import assets and generate the Library the first time you open it.
 
 ## Contributing
